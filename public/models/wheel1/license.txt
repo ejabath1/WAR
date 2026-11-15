@@ -1,0 +1,11 @@
+Model Information:
+* title:	Game Ready alloy wheel model
+* source:	https://sketchfab.com/3d-models/game-ready-alloy-wheel-model-4b5f06a789104729aaf1c76f4985cea6
+* author:	shubhankar.arch.3d (https://sketchfab.com/shubhankar.arch.3d)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Game Ready alloy wheel model" (https://sketchfab.com/3d-models/game-ready-alloy-wheel-model-4b5f06a789104729aaf1c76f4985cea6) by shubhankar.arch.3d (https://sketchfab.com/shubhankar.arch.3d) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

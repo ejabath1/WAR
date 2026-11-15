@@ -1,0 +1,11 @@
+Model Information:
+* title:	Alloy Wheel assignment
+* source:	https://sketchfab.com/3d-models/alloy-wheel-assignment-b7382941b1f74d9e964ec0d9bc3c6ee1
+* author:	beyond9thousand (https://sketchfab.com/beyond9thousand)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Alloy Wheel assignment" (https://sketchfab.com/3d-models/alloy-wheel-assignment-b7382941b1f74d9e964ec0d9bc3c6ee1) by beyond9thousand (https://sketchfab.com/beyond9thousand) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

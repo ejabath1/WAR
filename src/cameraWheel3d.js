@@ -51,6 +51,11 @@ export function initCameraWheel() {
   let rotationX = 0
   let rotationY = 0
 
+  // Smooth AR tracking
+const targetRotation = new THREE.Vector3()
+
+const clock = new THREE.Clock()
+
   function loadModel(path) {
     const thisRequest = ++requestNumber
 
@@ -130,11 +135,52 @@ currentModel.updateMatrixWorld(true)
 
   resize()
 
-  function animate() {
-    requestAnimationFrame(animate)
+  
+function smoothAngle(current, target, speed, delta) {
 
-    renderer.render(scene, camera)
-  }
+  const difference = THREE.MathUtils.euclideanModulo(
+    target - current + Math.PI,
+    Math.PI * 2
+  ) - Math.PI
+
+  return current + difference * (
+    1 - Math.exp(-speed * delta)
+  )
+}
+
+function animate() {
+
+  requestAnimationFrame(animate)
+
+  const delta = Math.min(clock.getDelta(), 0.05)
+
+  // Smooth all three rotation axes
+  wheelGroup.rotation.x = smoothAngle(
+    wheelGroup.rotation.x,
+    targetRotation.x,
+    9,
+    delta
+  )
+
+  wheelGroup.rotation.y = smoothAngle(
+    wheelGroup.rotation.y,
+    targetRotation.y,
+    9,
+    delta
+  )
+
+  wheelGroup.rotation.z = smoothAngle(
+    wheelGroup.rotation.z,
+    targetRotation.z,
+    9,
+    delta
+  )
+
+  renderer.render(scene, camera)
+}
+
+animate()
+
 
   animate()
 
@@ -153,7 +199,8 @@ currentModel.updateMatrixWorld(true)
       wheelGroup.scale.setScalar(wheelScale)
     },
 
-    // Rotate actual 3D model
+   
+    // Rotate actual 3D model manually
     rotateX(value) {
       rotationX += value
       wheelGroup.rotation.x = rotationX
@@ -163,6 +210,20 @@ currentModel.updateMatrixWorld(true)
       rotationY += value
       wheelGroup.rotation.y = rotationY
     },
+
+    // Apply rotation received from Python OpenCV
+    setTrackingRotation(rotation) {
+
+  const toRadians = THREE.MathUtils.degToRad
+
+  targetRotation.set(
+    toRadians(rotation.x),
+    toRadians(rotation.y),
+    toRadians(rotation.z)
+  )
+
+},
+
 
     resize,
 

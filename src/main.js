@@ -399,6 +399,19 @@ async function detectWheel() {
 
     if (result.found) {
 
+      // ========================================
+      // APPLY 3D ROTATION FROM OPENCV
+      // ========================================
+
+      if (result.rotation && cameraWheel) {
+
+        cameraWheel.setTrackingRotation(
+          result.rotation
+        )
+
+      }
+
+
       const containerRect = cameraContainer.getBoundingClientRect()
 
       const videoWidth = video.videoWidth
@@ -474,7 +487,7 @@ function startDetection() {
       detectWheel()
     }
 
-  }, 250)
+  }, 100)
 
   console.log('WHEEL CART: Detection started')
 

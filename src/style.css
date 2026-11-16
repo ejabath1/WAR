@@ -1033,3 +1033,30 @@ input[type="range"] {
   width: 100%;
   height: 100%;
 }
+
+
+/* MindAR image-tracking camera layer */
+#mindar-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #101216;
+}
+
+#mindar-container video,
+#mindar-container canvas {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+#mindar-container video { z-index: 1; }
+#mindar-container canvas { z-index: 2; }
+#mindar-container .mindar-ui-overlay { z-index: 4; }
+#mindar-container .mindar-ui-scanning { z-index: 5; }

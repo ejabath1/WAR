@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200">
+<rect width="1200" height="1200" fill="#fff"/>
+<g fill="#111318">
+<path d="M65 65h205v34H99v171H65zM930 65h205v205h-34V99H930zM65 930h34v171h171v34H65zM1101 930h34v205H930v-34h171z"/>
+<path d="M310 90h34v150h-34zM378 90h17v95h-17zM430 90h50v150h-50zM515 90h22v95h-22zM580 90h34v150h-34zM650 90h17v95h-17zM710 90h50v150h-50zM800 90h22v95h-22zM870 90h34v150h-34z"/>
+<path d="M90 310h150v34H90zM90 378h95v17H90zM90 430h150v50H90zM90 515h95v22H90zM90 580h150v34H90zM90 650h95v17H90zM90 710h150v50H90zM90 800h95v22H90zM90 870h150v34H90z"/>
+<path d="M310 1110h34V960h-34zM378 1110h17v-95h-17zM430 1110h50V960h-50zM515 1110h22v-95h-22zM580 1110h34V960h-34zM650 1110h17v-95h-17zM710 1110h50V960h-50zM800 1110h22v-95h-22zM870 1110h34V960h-34z"/>
+<path d="M1110 310H960v34h150zM1110 378h-95v17h95zM1110 430H960v50h150zM1110 515h-95v22h95zM1110 580H960v34h150zM1110 650h-95v17h95zM1110 710H960v50h150zM1110 800h-95v22h95zM1110 870H960v34h150z"/>
+<circle cx="600" cy="600" r="280" fill="none" stroke="#111318" stroke-width="20"/>
+<circle cx="600" cy="600" r="232" fill="none" stroke="#111318" stroke-width="5"/>
+<path d="M600 350l38 156 145-95-95 145 156 44-156 38 95 145-145-95-38 156-44-156-145 95 95-145-156-38 156-44-95-145 145 95z" fill="none" stroke="#111318" stroke-width="12"/>
+<circle cx="600" cy="600" r="68"/><circle cx="600" cy="600" r="22" fill="#fff"/>
+<path d="M300 510h600v180H300z" fill="#fff" stroke="#111318" stroke-width="8"/>
+</g>
+<text x="600" y="584" text-anchor="middle" font-family="Arial,sans-serif" font-size="62" font-weight="800" letter-spacing="10" fill="#111318">WHEEL</text>
+<text x="600" y="652" text-anchor="middle" font-family="Arial,sans-serif" font-size="62" font-weight="800" letter-spacing="10" fill="#111318">CART</text>
+<text x="600" y="850" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="10" fill="#111318">DRIVE YOUR STYLE</text>
+<g fill="#111318"><circle cx="300" cy="300" r="12"/><rect x="875" y="275" width="55" height="22"/><path d="M275 875l40-40 40 40-40 40z"/><circle cx="900" cy="900" r="24"/></g>
+</svg>

@@ -1,6 +1,7 @@
 
 import './style.css'
 import { initCameraWheel } from './cameraWheel3d.js'
+import { MindARThree } from 'mind-ar/dist/mindar-image-three.prod.js'
 
 // ========================================
 // WHEEL CART - INITIALIZE WEBSITE
@@ -92,12 +93,13 @@ document.querySelector('#app').innerHTML = `
 
         <div class="camera-container">
 
+          <div id="mindar-container" aria-label="Live image tracking camera"></div>
           <video id="camera" autoplay playsinline muted></video>
 
           <div id="placeholder">
             <div class="camera-placeholder-icon">WC</div>
             <h3>Your wheel experience starts here.</h3>
-            <p>Start your camera to preview your alloy.</p>
+            <p>Start the camera and scan your WheelCart marker.</p>
             <span class="camera-placeholder-note">
               CAMERA PREVIEW
             </span>
@@ -109,7 +111,7 @@ document.querySelector('#app').innerHTML = `
 
           <div class="camera-label">
             <span class="live-dot"></span>
-            LIVE CAMERA PREVIEW
+            <span id="tracking-status">CAMERA READY · SCAN MARKER</span>
           </div>
 
           <span class="camera-corner-label">
@@ -188,7 +190,7 @@ document.querySelector('#app').innerHTML = `
           </div>
 
           <p class="drag-note">
-            TIP — DRAG THE ALLOY TO POSITION IT.
+            TIP — KEEP THE WHEELCART MARKER IN VIEW.
           </p>
 
           <div class="rotation-controls">
@@ -313,277 +315,94 @@ document.querySelector('#rotateRight')
   })
 
 // ========================================
-// CAMERA AND DETECTION VARIABLES
+// MINDAR IMAGE TRACKING
 // ========================================
 
-let cameraStream = null
-let detectionActive = false
-let detectionBusy = false
-let detectionTimer = null
+let mindarThree = null
+let trackingAnchor = null
+let trackingActive = false
 
-let lastDetectedDiameter = 150
-let manuallyPositioned = false
-
-const detectionCanvas = document.createElement('canvas')
-detectionCanvas.width = 640
-detectionCanvas.height = 480
-
-const detectionContext = detectionCanvas.getContext('2d')
-
-// ========================================
-// UPDATE ALLOY SIZE
-// ========================================
+const trackingStatus = document.querySelector('#tracking-status')
 
 function updateWheelSize() {
-
-  const userScale = Number(sizeSlider.value) / 150
-
-  const diameter = lastDetectedDiameter * userScale
-
-  wheel.style.width = `${diameter}px`
-  wheel.style.height = `${diameter}px`
-
+  const scale = Number(sizeSlider.value) / 150
   sizeValue.textContent = `${sizeSlider.value} px`
-
-  cameraWheel?.resize()
-
+  cameraWheel?.setScale(scale)
 }
 
 sizeSlider.addEventListener('input', updateWheelSize)
-
-// ========================================
-// AUTOMATIC WHEEL DETECTION
-// ========================================
-
-async function detectWheel() {
-
-  if (!detectionActive || detectionBusy) return
-
-  if (video.readyState < 2) return
-
-  detectionBusy = true
-
-  try {
-
-    detectionContext.drawImage(
-      video,
-      0, 0,
-      640, 480
-    )
-
-    const blob = await new Promise(resolve => {
-      detectionCanvas.toBlob(resolve, 'image/jpeg', 0.65)
-    })
-
-    if (!blob || !detectionActive) return
-
-    const formData = new FormData()
-
-    formData.append('frame', blob, 'frame.jpg')
-
-    const response = await fetch(
-      'http://127.0.0.1:5000/detect',
-      {
-        method: 'POST',
-        body: formData
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error(`Detection server error: ${response.status}`)
-    }
-
-    const result = await response.json()
-
-    if (!detectionActive) return
-
-    if (result.found) {
-
-      // ========================================
-      // APPLY 3D ROTATION FROM OPENCV
-      // ========================================
-
-      if (result.rotation && cameraWheel) {
-
-        cameraWheel.setTrackingRotation(
-          result.rotation
-        )
-
-      }
-
-
-      const containerRect = cameraContainer.getBoundingClientRect()
-
-      const videoWidth = video.videoWidth
-      const videoHeight = video.videoHeight
-
-      // Match the video element's object-fit: cover display
-      const scale = Math.max(
-        containerRect.width / videoWidth,
-        containerRect.height / videoHeight
-      )
-
-      const renderedWidth = videoWidth * scale
-      const renderedHeight = videoHeight * scale
-
-      const offsetX = (containerRect.width - renderedWidth) / 2
-      const offsetY = (containerRect.height - renderedHeight) / 2
-
-      const centerX =
-        result.x * renderedWidth + offsetX
-
-      const centerY =
-        result.y * renderedHeight + offsetY
-
-      // Detection radius is normalized to the 640px frame width
-      const detectedDiameter =
-        result.radius * 2 * 640 * (videoWidth / 640) * scale
-
-      lastDetectedDiameter = detectedDiameter
-
-      updateWheelSize()
-
-      if (!manuallyPositioned) {
-
-        wheel.style.left =
-          `${centerX - wheel.offsetWidth / 2}px`
-
-        wheel.style.top =
-          `${centerY - wheel.offsetHeight / 2}px`
-
-      }
-
-      wheel.style.display = 'block'
-
-    }
-
-  } catch (error) {
-
-    console.error('Wheel detection error:', error)
-
-  } finally {
-
-    detectionBusy = false
-
-  }
-
-}
-
-// ========================================
-// START AND STOP DETECTION
-// ========================================
-
-function startDetection() {
-
-  if (detectionActive) return
-
-  detectionActive = true
-
-  detectWheel()
-
-  detectionTimer = setInterval(() => {
-
-    if (!detectionBusy) {
-      detectWheel()
-    }
-
-  }, 100)
-
-  console.log('WHEEL CART: Detection started')
-
-}
-
-function stopDetection() {
-
-  detectionActive = false
-
-  if (detectionTimer) {
-    clearInterval(detectionTimer)
-    detectionTimer = null
-  }
-
-  console.log('WHEEL CART: Detection stopped')
-
-}
-
-// ========================================
-// START CAMERA
-// ========================================
+updateWheelSize()
 
 async function startCamera() {
+  if (trackingActive) return
 
   try {
-
-    if (cameraStream) return
-
-    cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 640 },
-        height: { ideal: 480 }
-      },
-      audio: false
+    trackingStatus.textContent = 'STARTING CAMERA…'
+    document.querySelector('#mindar-container').style.display = 'block'
+    mindarThree = new MindARThree({
+      container: document.querySelector('#mindar-container'),
+      imageTargetSrc: '/targets/wheelcart.mind',
+      uiLoading: 'yes',
+      uiScanning: 'yes',
+      uiError: 'yes',
+      filterMinCF: 0.0001,
+      filterBeta: 0.001
     })
 
-    video.srcObject = cameraStream
+    const { renderer, scene, camera } = mindarThree
+    trackingAnchor = mindarThree.addAnchor(0)
+    cameraWheel?.attachTo(trackingAnchor.group)
 
-    await video.play()
+    trackingAnchor.onTargetFound = () => {
+      trackingStatus.textContent = 'MARKER FOUND · ALLOY ACTIVE'
+      placeholder.style.display = 'none'
+    }
 
-    video.style.display = 'block'
+    trackingAnchor.onTargetLost = () => {
+      trackingStatus.textContent = 'SEARCHING FOR WHEELCART MARKER…'
+    }
+
+    await mindarThree.start()
+    renderer.setAnimationLoop(() => renderer.render(scene, camera))
+    trackingActive = true
+    video.style.display = 'none'
     placeholder.style.display = 'none'
-
-    wheel.style.display = 'none'
-
-    manuallyPositioned = false
-
-    startDetection()
-
-    console.log('WHEEL CART: Camera started')
-
+    trackingStatus.textContent = 'SCAN YOUR WHEELCART MARKER'
   } catch (error) {
-
-    console.error('Camera error:', error)
-
-    alert('Camera could not start. Check camera permissions.')
-
+    console.error('MindAR start error:', error)
+    document.querySelector('#mindar-container').style.display = 'none'
+    trackingStatus.textContent = 'CAMERA COULD NOT START'
+    if (mindarThree) {
+      try { await mindarThree.stop() } catch {}
+      mindarThree = null
+    }
+    alert('AR could not start. Check camera permission and confirm the WheelCart target file is installed.')
   }
-
 }
 
-// ========================================
-// STOP CAMERA
-// ========================================
-
-function stopCamera() {
-
-  stopDetection()
-
-  if (cameraStream) {
-
-    cameraStream.getTracks().forEach(track => track.stop())
-
-    cameraStream = null
-
+async function stopCamera() {
+  trackingActive = false
+  if (mindarThree) {
+    try {
+      mindarThree.renderer.setAnimationLoop(null)
+      await mindarThree.stop()
+    } catch (error) {
+      console.warn('MindAR stop:', error)
+    }
   }
-
+  cameraWheel?.detachFromAnchor()
+  mindarThree = null
+  trackingAnchor = null
+  document.querySelector('#mindar-container').innerHTML = ''
+  document.querySelector('#mindar-container').style.display = 'none'
   video.srcObject = null
-
   video.style.display = 'none'
-  wheel.style.display = 'none'
-
   placeholder.style.display = 'flex'
-
-  manuallyPositioned = false
-
-  console.log('WHEEL CART: Camera stopped')
-
+  trackingStatus.textContent = 'CAMERA READY · SCAN MARKER'
 }
 
-document.querySelector('#startCamera')
-  .addEventListener('click', startCamera)
-
-document.querySelector('#stopCamera')
-  .addEventListener('click', stopCamera)
+document.querySelector('#startCamera').addEventListener('click', startCamera)
+document.querySelector('#stopCamera').addEventListener('click', stopCamera)
 
 // ========================================
 // MANUAL ALLOY DRAGGING
@@ -595,7 +414,7 @@ let dragOffsetY = 0
 
 wheel.addEventListener('pointerdown', event => {
 
-  if (wheel.style.display === 'none') return
+  if (trackingActive || wheel.style.display === 'none') return
 
   dragging = true
   manuallyPositioned = true

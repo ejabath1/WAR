@@ -179,9 +179,6 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-animate()
-
-
   animate()
 
   // Load first alloy
@@ -191,6 +188,17 @@ animate()
 
     setModel(path) {
       loadModel(path)
+    },
+
+    attachTo(parent) {
+      if (!parent) return
+      parent.add(wheelGroup)
+      renderer.domElement.style.visibility = 'hidden'
+    },
+
+    detachFromAnchor() {
+      scene.add(wheelGroup)
+      renderer.domElement.style.visibility = 'visible'
     },
 
     // Change actual 3D model size

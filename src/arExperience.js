@@ -27,6 +27,23 @@ renderer.domElement.className = 'ar-canvas wheel-preview-canvas'
 renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;'
 const previewHost = document.querySelector('#wheel-preview')
 previewHost.appendChild(renderer.domElement)
+let previewDrag = null
+renderer.domElement.addEventListener('pointerdown', event => {
+  if (session) return
+  previewDrag = { x: event.clientX, y: event.clientY, pointerId: event.pointerId }
+  renderer.domElement.setPointerCapture(event.pointerId)
+})
+renderer.domElement.addEventListener('pointermove', event => {
+  if (!previewDrag || session || previewDrag.pointerId !== event.pointerId) return
+  const dx = event.clientX - previewDrag.x
+  const dy = event.clientY - previewDrag.y
+  wheelRoot.rotation.y += dx * 0.012
+  wheelRoot.rotation.x = THREE.MathUtils.clamp(wheelRoot.rotation.x + dy * 0.008, -0.6, 0.6)
+  previewDrag.x = event.clientX
+  previewDrag.y = event.clientY
+})
+renderer.domElement.addEventListener('pointerup', () => { previewDrag = null })
+renderer.domElement.addEventListener('pointercancel', () => { previewDrag = null })
 camera.position.set(0, 0, 2.6)
 camera.lookAt(0, 0, 0)
 camera.aspect = previewHost.clientWidth / Math.max(previewHost.clientHeight, 1)

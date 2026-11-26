@@ -11,6 +11,8 @@ const diameterInput = document.querySelector('#diameter')
 const diameterValue = document.querySelector('#diameter-value')
 const hud = document.querySelector('#ar-hud')
 const hudStatus = document.querySelector('#hud-status')
+const arAvailability = document.querySelector('#ar-availability')
+const arCompatibility = document.querySelector('#ar-compatibility')
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera()
@@ -216,7 +218,7 @@ function renderFrame(_time, frame) {
 
 async function startAR() {
   if (!navigator.xr) {
-    setStatus('WebXR is not available here. Try a supported Android phone using Chrome over HTTPS.')
+    setStatus('3D Preview is ready. This browser does not expose WebXR immersive AR.')
     return
   }
   if (!currentModelPath || wheelRoot.children.length === 0) {
@@ -337,16 +339,23 @@ window.addEventListener('pagehide', () => {
 
 async function checkSupport() {
   if (!navigator.xr) {
-    setStatus('WebXR AR is not exposed by this browser. Use an ARCore-supported Android phone in Chrome over HTTPS.')
     startButton.disabled = true
+    if (arAvailability) arAvailability.textContent = 'NOT SUPPORTED'
+    if (arCompatibility) arCompatibility.textContent = 'WebXR is not available in this browser. The 3D Preview remains available.'
+    setStatus('3D Preview is ready. WebXR immersive AR is not available in this browser.')
     return
   }
   try {
     const supported = await navigator.xr.isSessionSupported('immersive-ar')
     startButton.disabled = !supported
+    if (arAvailability) arAvailability.textContent = supported ? 'BROWSER SUPPORT DETECTED' : 'NOT AVAILABLE ON THIS DEVICE'
+    if (arCompatibility) arCompatibility.textContent = supported
+      ? 'This browser reports immersive AR support. Actual camera session support will be checked when you start.'
+      : 'This phone/browser does not expose immersive AR. Use 3D Preview here, or test Real AR on an ARCore-certified Android device.'
+    startButton.textContent = supported ? 'START REAL AR ↗' : 'REAL AR NOT SUPPORTED'
     setStatus(supported
-      ? 'This browser reports immersive AR support. Load a model, then start the camera.'
-      : 'Immersive AR is not supported on this device/browser.')
+      ? '3D Preview is ready. This browser reports immersive AR support.'
+      : '3D Preview is ready. Immersive AR is unavailable on this device/browser.')
   } catch {
     startButton.disabled = true
     setStatus('Could not verify WebXR support in this browser.')

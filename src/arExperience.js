@@ -21,8 +21,7 @@ renderer.setClearColor(0x000000, 0)
 renderer.outputColorSpace = THREE.SRGBColorSpace
 renderer.toneMapping = THREE.ACESFilmicToneMapping
 renderer.toneMappingExposure = 1
-renderer.domElement.className = 'ar-canvas'
-renderer.domElement.className = 'wheel-preview-canvas'
+renderer.domElement.className = 'ar-canvas wheel-preview-canvas'
 renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;'
 const previewHost = document.querySelector('#wheel-preview')
 previewHost.appendChild(renderer.domElement)
@@ -237,18 +236,21 @@ async function startAR() {
     const supported = await navigator.xr.isSessionSupported('immersive-ar')
     if (!supported) throw new Error('This browser or device does not support immersive WebXR AR.')
 
-    // Request the core immersive AR session without requiring optional
-    // capabilities. Some browsers reject hit-test as a required feature.
-    session = await navigator.xr.requestSession('immersive-ar', {
-      optionalFeatures: ['hit-test', 'anchors', 'dom-overlay'],
-      domOverlay: { root: document.body }
-    })
+    // Ask for only the AR session and hit-test capability. Do not request
+    // DOM overlay or anchors: they are not needed to show camera passthrough
+    // and can cause session-configuration rejection on some WebXR browsers.
     renderer.xr.setReferenceSpaceType('local')
+    try {
+      session = await navigator.xr.requestSession('immersive-ar', {
+        optionalFeatures: ['hit-test']
+      })
+    } catch (featureError) {
+      console.warn('AR session with optional hit-test was rejected; retrying basic immersive-ar.', featureError)
+      session = await navigator.xr.requestSession('immersive-ar')
+    }
     await renderer.xr.setSession(session)
     referenceSpace = await session.requestReferenceSpace('local')
 
-    // Hit testing is optional at session creation. Enable guided placement
-    // only when this browser actually exposes a hit-test source.
     try {
       viewerSpace = await session.requestReferenceSpace('viewer')
       hitTestSource = await session.requestHitTestSource({ space: viewerSpace })

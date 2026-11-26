@@ -17,7 +17,7 @@ This stage is isolated at `/ar.html`. It does not replace the existing prototype
 This is a real 3D world-anchored AR placement prototype, not yet a production wheel-replacement system.
 
 - It does not automatically detect or segment a vehicle wheel.
-- It does not estimate wheel diameter; the user must measure and enter it.
+- It does not estimate rim diameter; the user must measure and enter it.
 - Hit testing depends on the browser's AR implementation and its understanding of the visible surface. Some devices may fail to produce a hit on a curved, reflective tyre/rim.
 - World anchoring keeps the alloy fixed in the tracked scene. It does not yet track a vehicle or wheel that moves independently of the environment.
 - No depth-based occlusion, tyre masking, photometric relighting, or wheel-specific pose refinement is implemented yet.

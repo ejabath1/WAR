@@ -226,8 +226,12 @@ async function startAR() {
   }
 
   startButton.disabled = true
+  // Move the WebGL canvas outside .ar-main, which is hidden during XR.
   wheelRoot.visible = false
-  renderer.domElement.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:4;display:block;'
+  if (renderer.domElement.parentElement === previewHost) previewHost.removeChild(renderer.domElement)
+  document.body.appendChild(renderer.domElement)
+  renderer.domElement.style.cssText = 'position:fixed;inset:0;width:100vw;height:100dvh;z-index:4;display:block;'
+  renderer.setSize(window.innerWidth, window.innerHeight, false)
   setStatus('Requesting camera and AR permissions…')
   try {
     const supported = await navigator.xr.isSessionSupported('immersive-ar')
@@ -260,6 +264,10 @@ async function startAR() {
       try { await session.end() } catch {}
     }
     session = null
+    if (renderer.domElement.parentElement !== previewHost) previewHost.appendChild(renderer.domElement)
+    renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;'
+    renderer.setSize(previewHost.clientWidth, previewHost.clientHeight, false)
+    wheelRoot.visible = true
   }
 }
 

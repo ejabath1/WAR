@@ -22,8 +22,22 @@ renderer.outputColorSpace = THREE.SRGBColorSpace
 renderer.toneMapping = THREE.ACESFilmicToneMapping
 renderer.toneMappingExposure = 1
 renderer.domElement.className = 'ar-canvas'
-renderer.domElement.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:4;display:none;'
-document.body.appendChild(renderer.domElement)
+renderer.domElement.className = 'wheel-preview-canvas'
+renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;'
+const previewHost = document.querySelector('#wheel-preview')
+previewHost.appendChild(renderer.domElement)
+camera.position.set(0, 0, 2.6)
+camera.lookAt(0, 0, 0)
+camera.aspect = previewHost.clientWidth / Math.max(previewHost.clientHeight, 1)
+camera.updateProjectionMatrix()
+renderer.setSize(previewHost.clientWidth, previewHost.clientHeight, false)
+window.addEventListener('resize', () => {
+  if (!session) {
+    camera.aspect = previewHost.clientWidth / Math.max(previewHost.clientHeight, 1)
+    camera.updateProjectionMatrix()
+    renderer.setSize(previewHost.clientWidth, previewHost.clientHeight, false)
+  }
+})
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x5c6470, 2.1))
 const keyLight = new THREE.DirectionalLight(0xffffff, 2.2)
@@ -109,7 +123,8 @@ async function loadWheel(path) {
     model.position.sub(center)
     wheelRoot.add(model)
     applyPhysicalScale()
-    setStatus('3D alloy ready. Start AR on a supported phone.')
+    wheelRoot.visible = true
+    setStatus('3D alloy loaded. Preview it above, then start AR on a supported phone.')
   } catch (error) {
     console.error('Wheel model load failed:', error)
     setStatus(`Could not load the alloy model: ${error.message}`)
@@ -211,6 +226,8 @@ async function startAR() {
   }
 
   startButton.disabled = true
+  wheelRoot.visible = false
+  renderer.domElement.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:4;display:block;'
   setStatus('Requesting camera and AR permissions…')
   try {
     const supported = await navigator.xr.isSessionSupported('immersive-ar')
@@ -259,7 +276,15 @@ function onSessionEnd() {
   wheelRoot.visible = false
   reticle.visible = false
   renderer.setAnimationLoop(null)
-  renderer.domElement.style.display = 'none'
+  renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;'
+  previewHost.appendChild(renderer.domElement)
+  wheelRoot.visible = true
+  camera.position.set(0, 0, 2.6)
+  camera.lookAt(0, 0, 0)
+  camera.aspect = previewHost.clientWidth / Math.max(previewHost.clientHeight, 1)
+  camera.updateProjectionMatrix()
+  renderer.setSize(previewHost.clientWidth, previewHost.clientHeight, false)
+  renderer.setAnimationLoop(renderFrame)
   document.body.classList.remove('xr-active')
   hud.classList.remove('active')
   startButton.disabled = false
@@ -307,4 +332,5 @@ async function checkSupport() {
 }
 
 await loadWheel(designSelect.value)
+renderer.setAnimationLoop(renderFrame)
 await checkSupport()

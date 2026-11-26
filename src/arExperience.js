@@ -237,11 +237,20 @@ async function startAR() {
     const supported = await navigator.xr.isSessionSupported('immersive-ar')
     if (!supported) throw new Error('This browser or device does not support immersive WebXR AR.')
 
-    session = await navigator.xr.requestSession('immersive-ar', {
-      requiredFeatures: ['hit-test'],
-      optionalFeatures: ['anchors', 'dom-overlay'],
-      domOverlay: { root: document.body }
-    })
+    // Try the richer session first. Some AR browsers reject optional
+    // DOM-overlay/anchor configuration, so fall back to core hit-testing.
+    try {
+      session = await navigator.xr.requestSession('immersive-ar', {
+        requiredFeatures: ['hit-test'],
+        optionalFeatures: ['anchors', 'dom-overlay'],
+        domOverlay: { root: document.body }
+      })
+    } catch (enhancedError) {
+      console.warn('Enhanced WebXR session config was rejected; retrying with hit-test only.', enhancedError)
+      session = await navigator.xr.requestSession('immersive-ar', {
+        requiredFeatures: ['hit-test']
+      })
+    }
     renderer.xr.setReferenceSpaceType('local')
     await renderer.xr.setSession(session)
     referenceSpace = await session.requestReferenceSpace('local')

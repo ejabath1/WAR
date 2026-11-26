@@ -10,7 +10,7 @@
   <body>
     <div id="ar-app">
       <header class="ar-header">
-        <a class="brand" href="/" aria-label="Wheel Cart home">WHEEL <b>CART</b><span> / REAL AR</span></a>
+        <a class="brand" href="./" aria-label="Wheel Cart home">WHEEL <b>CART</b><span> / REAL AR</span></a>
         <span class="header-tag">GUIDED 3D FITMENT</span>
       </header>
 
@@ -28,8 +28,8 @@
           </div>
           <label class="field-label" for="design">ALLOY DESIGN</label>
           <select id="design">
-            <option value="/models/wheel1/scene-converted.glb">Alloy Design 01 · Silver</option>
-            <option value="/models/wheel2/scene.gltf">Alloy Design 02 · Dark</option>
+            <option value="models/wheel1/scene-converted.glb">Alloy Design 01 · Silver</option>
+            <option value="models/wheel2/scene.gltf">Alloy Design 02 · Dark</option>
           </select>
           <label class="field-label" for="diameter">ALLOY RIM DIAMETER <output id="diameter-value">600 mm</output></label>
           <input id="diameter" type="range" min="400" max="760" step="5" value="600" />
@@ -56,6 +56,6 @@
         <div class="hud-bottom"><span>WHEEL CART / AR LAB</span><button id="reset-placement" disabled>RESET PLACEMENT</button></div>
       </div>
     </div>
-    <script type="module" src="/src/arExperience.js"></script>
+    <script type="module" src="./src/arExperience.js"></script>
   </body>
 </html>

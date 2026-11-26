@@ -37,7 +37,13 @@
           <label class="field-label" for="diameter">ALLOY RIM DIAMETER <output id="diameter-value">600 mm</output></label>
           <input id="diameter" type="range" min="400" max="760" step="5" value="600" />
           <div class="range-labels"><span>400 MM</span><span>760 MM</span></div>
-          <button id="start-ar" class="primary-button">START REAL AR <span>↗</span></button>
+          <div class="mode-status" role="status">
+            <div class="mode-row"><span class="mode-dot preview-dot"></span><b>3D PREVIEW</b><span class="mode-pill">AVAILABLE ON THIS DEVICE</span></div>
+            <p>Explore the selected alloy in 3D on your current phone. Drag the model to rotate it.</p>
+            <div class="mode-row ar-mode-row"><span class="mode-dot ar-dot"></span><b>REAL CAMERA AR</b><span id="ar-availability" class="mode-pill">CHECKING DEVICE…</span></div>
+            <p id="ar-compatibility">Camera-based AR requires a supported ARCore device and browser. Your 3D preview works independently.</p>
+          </div>
+          <button id="start-ar" class="primary-button" disabled>REAL AR NOT SUPPORTED <span>↗</span></button>
           <button id="end-ar" class="secondary-button" disabled>END AR SESSION</button>
           <p id="status" class="status" role="status">Checking this browser's AR capability…</p>
         </section>

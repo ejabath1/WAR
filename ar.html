@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#090b10" />
+    <meta name="description" content="Position a 3D alloy wheel in real-world space with guided WebXR." />
+    <title>WHEEL CART — Real AR Studio</title>
+  </head>
+  <body>
+    <div id="ar-app">
+      <header class="ar-header">
+        <a class="brand" href="/" aria-label="Wheel Cart home">WHEEL <b>CART</b><span> / REAL AR</span></a>
+        <span class="header-tag">GUIDED 3D FITMENT</span>
+      </header>
+
+      <main class="ar-main">
+        <section class="intro">
+          <p class="eyebrow">WHEEL CART · EXPERIMENTAL WEBAR</p>
+          <h1>Put the wheel<br /><em>in its place.</em></h1>
+          <p class="intro-copy">Start an AR session, aim at the centre of a parked car's wheel, and tap to anchor your selected 3D alloy in the real scene.</p>
+        </section>
+
+        <section class="setup-panel" aria-label="Wheel setup">
+          <div class="setup-heading">
+            <span>01 / CONFIGURE</span>
+            <span class="setup-note">BEFORE ENTERING AR</span>
+          </div>
+          <label class="field-label" for="design">ALLOY DESIGN</label>
+          <select id="design">
+            <option value="/models/wheel1/scene-converted.glb">Alloy Design 01 · Silver</option>
+            <option value="/models/wheel2/scene.gltf">Alloy Design 02 · Dark</option>
+          </select>
+          <label class="field-label" for="diameter">REAL WHEEL DIAMETER <output id="diameter-value">600 mm</output></label>
+          <input id="diameter" type="range" min="400" max="760" step="5" value="600" />
+          <div class="range-labels"><span>400 MM</span><span>760 MM</span></div>
+          <button id="start-ar" class="primary-button">START REAL AR <span>↗</span></button>
+          <button id="end-ar" class="secondary-button" disabled>END AR SESSION</button>
+          <p id="status" class="status" role="status">Checking this browser's AR capability…</p>
+        </section>
+
+        <section class="instructions">
+          <p class="eyebrow">02 / IN THE CAMERA</p>
+          <ol>
+            <li><b>Scan slowly.</b> Move the phone until the reticle sits on the centre of the real wheel.</li>
+            <li><b>Tap once.</b> The 3D alloy is placed at the hit point and anchored in world space when the device supports anchors.</li>
+            <li><b>Step back.</b> Move around the parked car to inspect the placement from different angles.</li>
+          </ol>
+          <p class="caution">Use a parked vehicle in a well-lit area. This guided prototype does not automatically identify the wheel or estimate its diameter. Measure the wheel and enter its diameter above.</p>
+        </section>
+      </main>
+
+      <div id="ar-hud" aria-live="polite">
+        <div class="hud-top"><span class="live-indicator"></span><span id="hud-status">AR NOT STARTED</span></div>
+        <div class="aim-guide">AIM AT THE WHEEL CENTRE · TAP TO PLACE</div>
+        <div class="hud-bottom"><span>WHEEL CART / AR LAB</span><button id="reset-placement" disabled>RESET PLACEMENT</button></div>
+      </div>
+    </div>
+    <script type="module" src="/src/arExperience.js"></script>
+  </body>
+</html>

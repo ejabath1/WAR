@@ -237,25 +237,26 @@ async function startAR() {
     const supported = await navigator.xr.isSessionSupported('immersive-ar')
     if (!supported) throw new Error('This browser or device does not support immersive WebXR AR.')
 
-    // Try the richer session first. Some AR browsers reject optional
-    // DOM-overlay/anchor configuration, so fall back to core hit-testing.
-    try {
-      session = await navigator.xr.requestSession('immersive-ar', {
-        requiredFeatures: ['hit-test'],
-        optionalFeatures: ['anchors', 'dom-overlay'],
-        domOverlay: { root: document.body }
-      })
-    } catch (enhancedError) {
-      console.warn('Enhanced WebXR session config was rejected; retrying with hit-test only.', enhancedError)
-      session = await navigator.xr.requestSession('immersive-ar', {
-        requiredFeatures: ['hit-test']
-      })
-    }
+    // Request the core immersive AR session without requiring optional
+    // capabilities. Some browsers reject hit-test as a required feature.
+    session = await navigator.xr.requestSession('immersive-ar', {
+      optionalFeatures: ['hit-test', 'anchors', 'dom-overlay'],
+      domOverlay: { root: document.body }
+    })
     renderer.xr.setReferenceSpaceType('local')
     await renderer.xr.setSession(session)
     referenceSpace = await session.requestReferenceSpace('local')
-    viewerSpace = await session.requestReferenceSpace('viewer')
-    hitTestSource = await session.requestHitTestSource({ space: viewerSpace })
+
+    // Hit testing is optional at session creation. Enable guided placement
+    // only when this browser actually exposes a hit-test source.
+    try {
+      viewerSpace = await session.requestReferenceSpace('viewer')
+      hitTestSource = await session.requestHitTestSource({ space: viewerSpace })
+    } catch (hitTestError) {
+      console.warn('WebXR hit-test is unavailable in this session.', hitTestError)
+      viewerSpace = null
+      hitTestSource = null
+    }
 
     session.addEventListener('end', onSessionEnd, { once: true })
     renderer.xr.setAnimationLoop(renderFrame)
@@ -263,8 +264,10 @@ async function startAR() {
     document.body.classList.add('xr-active')
     hud.classList.add('active')
     endButton.disabled = false
-    setHud('MOVE SLOWLY · FIND THE WHEEL CENTRE')
-    setStatus('AR session active.')
+    setHud(hitTestSource ? 'MOVE SLOWLY · FIND THE WHEEL CENTRE' : 'CAMERA ACTIVE · SURFACE DETECTION NOT SUPPORTED')
+    setStatus(hitTestSource
+      ? 'AR session active. Move slowly until the reticle appears.'
+      : 'AR camera started, but this browser does not support hit-test placement. Try Chrome on an ARCore-supported Android phone.')
   } catch (error) {
     console.error('Unable to start WebXR session:', error)
     setStatus(error.message || 'AR could not start. Check browser and camera permissions.')

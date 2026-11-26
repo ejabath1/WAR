@@ -41,3 +41,17 @@ body.xr-active .ar-header,body.xr-active .ar-main{display:none}
 .wheel-preview{height:230px;position:relative;overflow:hidden;border-radius:10px;background:radial-gradient(ellipse at center,#293343 0,#121923 48%,#090c12 100%);border:1px solid #ffffff14;margin:-4px 0 22px}
 .wheel-preview canvas{display:block;width:100%;height:100%;outline:none}
 .preview-label{position:absolute;z-index:1;top:12px;left:14px;color:#9ba6b6;font:9px 'DM Mono',monospace;letter-spacing:.1em;pointer-events:none}
+
+.mode-status{margin-top:22px;padding:15px 14px;background:#0b1018;border:1px solid #ffffff18;border-radius:9px}
+.mode-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font:9px 'DM Mono',monospace;letter-spacing:.08em}
+.mode-row b{font-weight:500;color:#f4f5f7}
+.mode-pill{margin-left:auto;color:#aab4c2;font-size:8px}
+.mode-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.preview-dot{background:#4bd49a;box-shadow:0 0 10px #4bd49a66}
+.ar-dot{background:#ff5363}
+.mode-status p{margin:8px 0 15px 16px;color:#8995a5;font-size:10px;line-height:1.65;letter-spacing:0}
+.mode-status p:last-child{margin-bottom:0}
+.ar-mode-row{border-top:1px solid #ffffff12;padding-top:13px}
+.wheel-preview{touch-action:pan-y}
+.wheel-preview canvas{touch-action:pan-y;cursor:grab}
+.wheel-preview canvas:active{cursor:grabbing}
